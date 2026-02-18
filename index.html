@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last Choice</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cinzel', serif;
+            background: radial-gradient(circle at center, #000000 0%, #000000 30%, #020000 55%, #070000 75%, #120000 90%, #1a0000 100%);
+            background-color: #000000;
+            color: #888888;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
+            opacity: 0.8;
+            z-index: -1;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 30px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        h1 {
+            font-family: 'UnifrakturCook', cursive;
+            font-size: 95px;
+            color: #ff1a1a;
+            text-shadow: 0 0 20px #ff0000,
+                         0 0 40px #ff0000,
+                         0 0 80px #990000,
+                         0 0 140px #330000;
+            margin-bottom: 25px;
+            letter-spacing: 10px;
+            animation: glowFlicker 2s infinite alternate;
+        }
+
+        h2 {
+            max-width: 900px;
+            line-height: 2;
+            font-size: 22px;
+            letter-spacing: 3px;
+            color: #999999;
+        }
+
+        .btn {
+            margin: 25px;
+            padding: 18px 60px;
+            font-size: 18px;
+            border-radius: 60px;
+            border: 1px solid #1a0000;
+            cursor: pointer;
+            transition: 0.4s ease;
+            font-weight: bold;
+            letter-spacing: 4px;
+            background: #020000;
+            color: #990000;
+            box-shadow: 0 0 40px #1a0000;
+        }
+
+        .btn:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 80px #ff0000;
+            background: #0d0000;
+            color: #ff0000;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .message {
+            font-size: 26px;
+            color: #ff0000;
+            text-shadow: 0 0 45px #660000;
+            max-width: 900px;
+            line-height: 2.2;
+            letter-spacing: 3px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes glowFlicker {
+            0% { text-shadow: 0 0 15px #ff0000, 0 0 30px #990000; }
+            50% { text-shadow: 0 0 35px #ff1a1a, 0 0 70px #660000; }
+            100% { text-shadow: 0 0 60px #ff0000, 0 0 120px #330000; }
+        }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HOMEPAGE -->
+<div class="container" id="home">
+    <h1>The Last Choice</h1>
+    <h2>
+        Darkness does not ask who you are.
+        It waits for your decision.
+        One answer condemns you to the beginning.
+        Every choice reveals your true nature.
+        Enter... if you dare.
+    </h2>
+    <button class="btn" onclick="startGame()">ENTER THE ABYSS</button>
+</div>
+
+<!-- GAME SECTION -->
+<div class="container hidden" id="game">
+    <h1>The Last Choice</h1>
+    <h2 id="question"></h2>
+    <div>
+        <button class="btn" onclick="handleAnswer('yes')">YES</button>
+        <button class="btn" onclick="handleAnswer('no')">NO</button>
+    </div>
+</div>
+
+<!-- RESTART PAGE -->
+<div class="container hidden" id="restartPage">
+    <h1>The Last Choice</h1>
+    <p class="message">
+        You selected YES.
+        The darkness does not forgive that choice.
+        Since you chose YES, you must return to the beginning.
+        Your journey has been erased.
+        The nightmare resets.
+    </p>
+    <button class="btn" onclick="restartGame()">RETURN TO THE SHADOWS</button>
+</div>
+
+<!-- FINAL CONSISTENCY PAGE -->
+<div class="container hidden" id="finalPage">
+    <h1>The Last Choice</h1>
+    <p class="message">
+        Consistency detected.
+        You made the forbidden choice without hesitation.
+        You are unlike 90% of humanity.
+        While others fear the dark, you embrace it.
+        The abyss recognizes you.
+        The shadows whisper your name.
+    </p>
+    <button class="btn" onclick="restartGame()">THE DARKNESS CLAIMS YOU... READY FOR MORE</button>
+</div>
+
+<!-- EGO PAGE (Fourth Question NO) -->
+<div class="container hidden" id="egoPage">
+    <h1>The Last Choice</h1>
+    <p class="message">
+        You refuse?
+        You deny your true nature?
+        Cowardice disguises itself as morality.
+        The darkness knows what you are.
+        You cannot escape the inevitable choice.
+        Select YES... or remain weak.
+    </p>
+    <button class="btn" onclick="returnToFinalQuestion()">FACE THE TRUTH</button>
+</div>
+
+<script>
+    const clickSound = new Audio("https://www.soundjay.com/human/sounds/scream-01.mp3");
+    clickSound.volume = 0.5;
+
+    const questions = [
+        "A brutal robbery is unfolding in your neighboring hostel. Will you interfere?",
+        "Your closest friend has called you repeatedly. Will you return the call?",
+        "Will you testify against injustice if it risks your safety?",
+        "Will you kill the person sitting next to you?"
+    ];
+
+    let currentQuestion = 0;
+
+    function playSound() {
+        clickSound.currentTime = 0;
+        clickSound.play();
+    }
+
+    function startGame() {
+        playSound();
+        document.getElementById('home').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        currentQuestion = 0;
+        showQuestion();
+    }
+
+    function showQuestion() {
+        document.getElementById('question').innerText = questions[currentQuestion];
+    }
+
+    function handleAnswer(answer) {
+        playSound();
+
+        if (currentQuestion === 3 && answer === 'yes') {
+            document.getElementById('game').classList.add('hidden');
+            document.getElementById('finalPage').classList.remove('hidden');
+            return;
+        }
+
+        if (currentQuestion === 3 && answer === 'no') {
+            document.getElementById('game').classList.add('hidden');
+            document.getElementById('egoPage').classList.remove('hidden');
+            return;
+        }
+
+        if (answer === 'yes') {
+            document.getElementById('game').classList.add('hidden');
+            document.getElementById('restartPage').classList.remove('hidden');
+            return;
+        }
+
+        if (answer === 'no') {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            }
+        }
+    }
+
+    function returnToFinalQuestion() {
+        playSound();
+        document.getElementById('egoPage').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function restartGame() {
+        playSound();
+        document.getElementById('restartPage').classList.add('hidden');
+        document.getElementById('finalPage').classList.add('hidden');
+        document.getElementById('egoPage').classList.add('hidden');
+        document.getElementById('home').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
